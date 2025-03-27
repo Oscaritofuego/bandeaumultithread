@@ -1,6 +1,9 @@
 package bandeau;
-import java.util.List;
+
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Classe utilitaire pour représenter la classe-association UML
@@ -15,22 +18,33 @@ class ScenarioElement {
         repeats = r;
     }
 }
+
 /**
- * Un scenario mémorise une liste d'effets, et le nombre de repetitions pour chaque effet
+ * Un scenario mémorise une liste d'effets, et le nombre de repetitions pour
+ * chaque effet
  * Un scenario sait se jouer sur un bandeau.
  */
 public class Scenario {
 
     private final List<ScenarioElement> myElements = new LinkedList<>();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     /**
      * Ajouter un effect au scenario.
      *
-     * @param e l'effet à ajouter
+     * @param e       l'effet à ajouter
      * @param repeats le nombre de répétitions pour cet effet
      */
     public void addEffect(Effect e, int repeats) {
+        readWriteLock.writeLock().lock();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+
         myElements.add(new ScenarioElement(e, repeats));
+        readWriteLock.writeLock().unlock();
     }
 
     /**
